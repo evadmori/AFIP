@@ -140,7 +140,24 @@ const fs = require('fs');
 	console.log({
 		'cae' : res.CAE, //CAE asignado a la Factura
 		'vencimiento' : res.CAEFchVto //Fecha de vencimiento del CAE
+
+		
 	});
+	const voucherInfo = await afip.ElectronicBilling.getVoucherInfo(numero_de_factura, punto_de_venta, tipo_de_factura);
+
+	if(voucherInfo === null){
+		console.log('El comprobante no existe');
+	}
+	else{
+		console.log('Esta es la información del comprobante:');
+		console.log(voucherInfo);
+		const codAut=voucherInfo.CodAutorizacion
+		if(voucherInfo.EmisionTipo =='CAE'){
+			const tipocodAut="E"
+		}else{
+			const tipocodAut="A"
+		}
+	}
 
 
 	//Crear PDF
@@ -170,12 +187,30 @@ const fs = require('fs');
 	// Mostramos la url del archivo creado
 	console.log(pdfres.file);
 
+	//datos codigo QR
+	const datos = {
+		'ver' 	: 1, // version del formato de los datos del comprobante
+		'fecha' 	: fecha, 
+		'cuit' 	: 20409378472,
+		'ptoVta' 	: punto_de_venta,
+		'tipoCmp' 	: tipo_de_factura,
+		'nroCmp' : numero_de_factura,
+		'importe' : importe_gravado + importe_iva + importe_exento_iva,
+		'moneda' 	: 'PES',	
+		'ctz'  : 1,
+		'tipoDocRec'  : tipo_de_documento,
+		'nroDocRec'    : numero_de_documento,
+		'tipoCodAut' 	: tipoCodAut,
+		'codAut': codAut,
+		
+	};
+
 	//Crear código QR
-	const facturaJsonString = JSON.stringify(res);
+	const facturaJsonString = JSON.stringify(datos);
 	const DATOS_CMP_BASE_64 = Buffer.from(facturaJsonString).toString('base64');
 	const qrCodeData = `https://www.afip.gob.ar/fe/qr/?p=${DATOS_CMP_BASE_64}`;
     QRCode.toFileStream(fs.createWriteStream('codigo_qr.png'), qrCodeData);
-	console.log("Datos para el código QR:", DATOS_CMP_BASE_64);
+	console.log("Datos para el código QR:", facturaJsonString);
 
 
 	//Crear PDF con factura y codigo QR
