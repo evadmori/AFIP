@@ -208,7 +208,8 @@ const fs = require('fs');
 	//Crear código QR
 	const facturaJsonString = JSON.stringify(datos);
 	const DATOS_CMP_BASE_64 = Buffer.from(facturaJsonString).toString('base64');
-	const qrCodeData = 'https://www.afip.gob.ar/fe/qr/?p=${DATOS_CMP_BASE_64}';
+	const qrCodeData = `https://www.afip.gob.ar/fe/qr/?p=${DATOS_CMP_BASE_64}`;
+	console.log(qrCodeData)
 	QRCode.toDataURL(qrCodeData, function (err, url) {
 		console.log(url)
 	  })
@@ -216,13 +217,14 @@ const fs = require('fs');
 
 
 	//Crear PDF con factura y codigo QR
-	const doc = new PDFDocument();
-    doc.fontSize(20).text('Factura Electrónica', { align: 'center' });
-    doc.text(facturaJsonString);
-    doc.image('codigo_qr.png', { width: 200, height: 200 });
-    doc.pipe(fs.createWriteStream('factura.pdf'));
-    doc.end();
+	
+	//const doc = new PDFDocument();
+    //doc.fontSize(20).text('Factura Electrónica', { align: 'center' });
+    //doc.text(facturaJsonString);
+    //doc.image('codigo_qr.png', { width: 200, height: 200 });
+    //doc.pipe(fs.createWriteStream('factura.pdf'));
+    //doc.end();
 
-    console.log('Factura y PDF creados correctamente.');
+    //console.log('Factura y PDF creados correctamente.');
 
 })();
