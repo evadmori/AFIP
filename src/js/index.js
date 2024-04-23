@@ -149,15 +149,7 @@ const fs = require('fs');
 	if(voucherInfo === null){
 		console.log('El comprobante no existe');
 	}
-	else{
-		const codAut=voucherInfo.CodAutorizacion;
-		let tipocodAut;
-		if(voucherInfo.EmisionTipo ==='CAE'){
-			tipocodAut="E"
-		}else{
-			tipocodAut="A"
-		}
-	}
+	
 
 
 	//Crear PDF
@@ -187,6 +179,10 @@ const fs = require('fs');
 	// Mostramos la url del archivo creado
 	console.log(pdfres.file);
 
+	const tipocodAut=voucherInfo.Resultado;
+	const codAut=voucherInfo.CodAutorizacion;
+	console.log(codAut)
+
 	//datos codigo QR
 	const datos = {
 		'ver' 	: 1, // version del formato de los datos del comprobante
@@ -200,8 +196,8 @@ const fs = require('fs');
 		'ctz'  : 1,
 		'tipoDocRec'  : tipo_de_documento,
 		'nroDocRec'    : numero_de_documento,
-		'tipoCodAut' 	: 'A',
-		'codAut': '70417054367476',
+		'tipoCodAut' 	: tipocodAut,
+		'codAut': codAut,
 		
 	};
 
