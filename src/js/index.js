@@ -151,12 +151,12 @@ const fs = require('fs');
 	}
 	
 
-
 	//Crear PDF
 
 	// Descargamos el HTML de ejemplo (ver mas arriba)
 	// y lo guardamos como bill.html
 	const html = require('fs').readFileSync('./bill.html', 'utf8');
+
 	
 	// Nombre para el archivo (sin .pdf)
 	const name = 'PDFprueba';
@@ -214,13 +214,21 @@ const fs = require('fs');
 
 	//Crear PDF con factura y codigo QR
 	
-	//const doc = new PDFDocument();
-    //doc.fontSize(20).text('Factura Electrónica', { align: 'center' });
-    //doc.text(facturaJsonString);
-    //doc.image('codigo_qr.png', { width: 200, height: 200 });
-    //doc.pipe(fs.createWriteStream('factura.pdf'));
-    //doc.end();
+	const doc = new PDFDocument();
+    const fileName = 'factura.pdf';
 
-    //console.log('Factura y PDF creados correctamente.');
+    // Agregar contenido al documento
+    doc.fontSize(20).text('Factura Electrónica', { align: 'center' });
 
-})();
+    // Insertar el código QR
+	const qrCodeImageBuffer = await QRCode.toBuffer(qrCodeData);
+    doc.image(qrCodeImageBuffer, { fit: [200, 200], align: 'center' });
+
+    // Finalizar y guardar el documento
+    doc.end();
+    doc.pipe(fs.createWriteStream(fileName));
+
+    console.log('Factura PDF creada correctamente.');
+}
+
+)();
