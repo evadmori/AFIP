@@ -2,39 +2,9 @@
 //incluir libreria en proyecto
 const Afip = require('@afipsdk/afip.js');
 const afip = new Afip({ CUIT: 20409378472 });
-
-
-//Crear PDF
-async function generarPDF() {
-    // Descargar el contenido del archivo bill.html
-    const html = require('fs').readFileSync('./bill.html', 'utf8');
-    
-    // Opciones para la generación del PDF
-    const options = {
-        width: 8,
-        marginLeft: 0.4,
-        marginRight: 0.4,
-        marginTop: 0.4,
-        marginBottom: 0.4
-    };
-    
-    // Crear el PDF
-    const res = await afip.ElectronicBilling.createPDF({
-        html: html,
-        file_name: 'PDF_de_prueba',
-        options: options
-    });
-    
-    // Mostrar la URL del archivo creado
-    console.log(res.file);
-}
-
-// Llamar a la función para generar el PDF
-generarPDF();
-
-
-
-
+const PDFDocument = require('pdfkit');
+const QRCode = require('qrcode');
+const fs = require('fs');
 
 //Factura B
 (async () => {
@@ -171,5 +141,51 @@ generarPDF();
 		'cae' : res.CAE, //CAE asignado a la Factura
 		'vencimiento' : res.CAEFchVto //Fecha de vencimiento del CAE
 	});
-})()
 
+
+	//Crear PDF
+
+	// Descargamos el HTML de ejemplo (ver mas arriba)
+	// y lo guardamos como bill.html
+	const html = require('fs').readFileSync('./bill.html', 'utf8');
+	
+	// Nombre para el archivo (sin .pdf)
+	const name = 'PDFprueba';
+	
+	// Opciones para el archivo
+	const options = {
+		width: 8, // Ancho de pagina en pulgadas. Usar 3.1 para ticket
+		marginLeft: 0.4, // Margen izquierdo en pulgadas. Usar 0.1 para ticket 
+		marginRight: 0.4, // Margen derecho en pulgadas. Usar 0.1 para ticket 
+		marginTop: 0.4, // Margen superior en pulgadas. Usar 0.1 para ticket 
+		marginBottom: 0.4 // Margen inferior en pulgadas. Usar 0.1 para ticket 
+	};
+	
+	// Creamos el PDF
+	const pdfres = await afip.ElectronicBilling.createPDF({
+		html: html,
+		file_name: name,
+		options: options});
+	
+	// Mostramos la url del archivo creado
+	console.log(pdfres.file);
+
+	//Crear código QR
+	const facturaJsonString = JSON.stringify(res);
+	const DATOS_CMP_BASE_64 = Buffer.from(facturaJsonString).toString('base64');
+	const qrCodeData = `https://www.afip.gob.ar/fe/qr/?p=${DATOS_CMP_BASE_64}`;
+    QRCode.toFileStream(fs.createWriteStream('codigo_qr.png'), qrCodeData);
+	console.log("Datos para el código QR:", DATOS_CMP_BASE_64);
+
+
+	//Crear PDF con factura y codigo QR
+	const doc = new PDFDocument();
+    doc.fontSize(20).text('Factura Electrónica', { align: 'center' });
+    doc.text(facturaJsonString);
+    doc.image('codigo_qr.png', { width: 200, height: 200 });
+    doc.pipe(fs.createWriteStream('factura.pdf'));
+    doc.end();
+
+    console.log('Factura y PDF creados correctamente.');
+
+})();

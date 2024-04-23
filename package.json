@@ -10,6 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@afipsdk/afip.js": "^1.1.1"
+    "@afipsdk/afip.js": "^1.1.1",
+    "fs": "^0.0.1-security",
+    "pdfkit": "^0.15.0",
+    "qrcode": "^1.5.3"
   }
 }
