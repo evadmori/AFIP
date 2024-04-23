@@ -145,17 +145,17 @@ const fs = require('fs');
 	});
 	const voucherInfo = await afip.ElectronicBilling.getVoucherInfo(numero_de_factura, punto_de_venta, tipo_de_factura);
 
+
 	if(voucherInfo === null){
 		console.log('El comprobante no existe');
 	}
 	else{
-		console.log('Esta es la información del comprobante:');
-		console.log(voucherInfo);
-		const codAut=voucherInfo.CodAutorizacion
-		if(voucherInfo.EmisionTipo =='CAE'){
-			const tipocodAut="E"
+		const codAut=voucherInfo.CodAutorizacion;
+		let tipocodAut;
+		if(voucherInfo.EmisionTipo ==='CAE'){
+			tipocodAut="E"
 		}else{
-			const tipocodAut="A"
+			tipocodAut="A"
 		}
 	}
 
@@ -200,8 +200,8 @@ const fs = require('fs');
 		'ctz'  : 1,
 		'tipoDocRec'  : tipo_de_documento,
 		'nroDocRec'    : numero_de_documento,
-		'tipoCodAut' 	: tipoCodAut,
-		'codAut': codAut,
+		'tipoCodAut' 	: 'A',
+		'codAut': '70417054367476',
 		
 	};
 
